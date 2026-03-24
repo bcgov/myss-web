@@ -27,7 +27,7 @@ PUBLIC_API_URL=http://localhost:8000
 
 # Auth.js — required for local development
 AUTH_SECRET=local-dev-secret
-AUTH_TRUST_HOST=true
+TRUST_HOST=true
 
 # Keycloak / BCeID OIDC (set to real values for login to work)
 AUTH_KEYCLOAK_ID=myss-web
@@ -35,7 +35,7 @@ AUTH_KEYCLOAK_SECRET=
 AUTH_KEYCLOAK_ISSUER=https://keycloak.example.gov.bc.ca/realms/myss
 ```
 
-**`AUTH_TRUST_HOST=true`** is required for local development. Auth.js rejects requests from `localhost` by default as an untrusted host. In production this is not needed because `AUTH_URL` is set to the real domain. Without this setting you will see `UntrustedHost` errors and 500s on every page load.
+**`TRUST_HOST=true`** is required for local development. The auth config in `src/lib/server/auth.ts` reads this variable to allow `localhost` as a trusted host. Without it, Auth.js rejects every request with an `UntrustedHost` error and 500s on every page load. In production, `trustHost` is enabled via `NODE_ENV=production`.
 
 **`AUTH_SECRET`** must be set to any non-empty string. Auth.js uses it to encrypt session cookies. In production, use a strong random value (at least 32 characters).
 
@@ -91,7 +91,7 @@ npm run dev
 ## Common Issues
 
 **`UntrustedHost: Host must be trusted` (500 error on every page)**
-Your `.env` is missing `AUTH_TRUST_HOST=true`. Auth.js rejects `localhost` as untrusted by default. Add this variable and restart the dev server.
+Your `.env` is missing `TRUST_HOST=true`. The auth config at `src/lib/server/auth.ts` uses this variable to allow localhost. Add it and restart the dev server.
 
 **`AUTH_SECRET` error on startup**
 `AUTH_SECRET` must be set in your `.env`. Any non-empty string works for local development.
