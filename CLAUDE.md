@@ -91,8 +91,8 @@ All API calls go through the myss-api backend. The frontend never directly conta
 | Variable | Required | Default | Description |
 |---|---|---|---|
 | `PUBLIC_API_URL` | Yes | `http://localhost:8000` | myss-api base URL |
-| `AUTH_SECRET` | Prod only | — | Auth.js session secret |
-| `AUTH_BCEID_CLIENT_ID` | Prod only | — | BCeID OAuth client ID |
-| `AUTH_BCEID_CLIENT_SECRET` | Prod only | — | BCeID OAuth client secret |
-| `AUTH_IDIR_CLIENT_ID` | Prod only | — | IDIR OAuth client ID |
-| `AUTH_IDIR_CLIENT_SECRET` | Prod only | — | IDIR OAuth client secret |
+| `AUTH_SECRET` | Yes | — | Auth.js session encryption secret (any string for local dev) |
+| `AUTH_TRUST_HOST` | Local only | `false` | Set to `true` for localhost — Auth.js rejects untrusted hosts by default |
+| `AUTH_KEYCLOAK_ID` | Prod only | — | Keycloak/BCeID OAuth client ID |
+| `AUTH_KEYCLOAK_SECRET` | Prod only | — | Keycloak/BCeID OAuth client secret |
+| `AUTH_KEYCLOAK_ISSUER` | Prod only | — | Keycloak OIDC issuer URL |
