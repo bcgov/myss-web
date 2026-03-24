@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myss-frontend
+  labels:
+    app: myss
+    component: frontend
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: myss
+      component: frontend
+  template:
+    metadata:
+      labels:
+        app: myss
+        component: frontend
+    spec:
+      containers:
+        - name: myss-frontend
+          image: myss-frontend:latest
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - secretRef:
+                name: myss-auth-secret
+            - configMapRef:
+                name: myss-frontend-config
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "50m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myss-frontend
+  labels:
+    app: myss
+    component: frontend
+spec:
+  selector:
+    app: myss
+    component: frontend
+  ports:
+    - port: 3000
+      targetPort: 3000
+  type: ClusterIP
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: myss-frontend
+  labels:
+    app: myss
+    component: frontend
+spec:
+  to:
+    kind: Service
+    name: myss-frontend
+  port:
+    targetPort: 3000
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

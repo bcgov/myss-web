@@ -1,0 +1,27 @@
+# Node / SvelteKit / Vite
+node_modules/
+.svelte-kit/
+build/
+dist/
+
+# Eligibility estimator build
+eligibility-estimator/node_modules/
+eligibility-estimator/dist/
+
+# Environment files (contain secrets)
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+.vscode/settings.json
+*.swp
+
+# Playwright
+test-results/
+playwright-report/

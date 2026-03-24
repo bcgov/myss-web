@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eligibility Estimator — Income Assistance BC</title>
+  <meta name="description"
+    content="Estimate whether you may qualify for BC income assistance. No personal information is stored." />
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 640px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+  </style>
+</head>
+<body>
+  <eligibility-estimator
+    api-url="VITE_API_URL_PLACEHOLDER"
+    registration-url="VITE_REGISTRATION_URL_PLACEHOLDER"
+  ></eligibility-estimator>
+
+  <!--
+    In development: `vite dev` serves the web component and replaces the placeholders.
+    In production: `vite build` produces dist/index.html with values from .env
+    and dist/eligibility-estimator.iife.js as the embeddable bundle.
+  -->
+  <script type="module" src="/src/EligibilityEstimator.svelte"></script>
+</body>
+</html>
