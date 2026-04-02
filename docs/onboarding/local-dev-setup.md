@@ -29,15 +29,39 @@ PUBLIC_API_URL=http://localhost:8000
 AUTH_SECRET=local-dev-secret
 TRUST_HOST=true
 
-# Keycloak / BCeID OIDC (set to real values for login to work)
+# Mock auth — bypass OIDC login for local development
+MOCK_AUTH=true
+# MOCK_AUTH_ROLE=CLIENT   # CLIENT (default), WORKER, or ADMIN
+# MOCK_AUTH_USER=Dev User # Display name for the mock session
+
+# Keycloak / BCeID OIDC (only needed if MOCK_AUTH is not true)
 AUTH_KEYCLOAK_ID=myss-web
 AUTH_KEYCLOAK_SECRET=
 AUTH_KEYCLOAK_ISSUER=https://keycloak.example.gov.bc.ca/realms/myss
 ```
 
-**`TRUST_HOST=true`** is required for local development. The auth config in `src/lib/server/auth.ts` reads this variable to allow `localhost` as a trusted host. Without it, Auth.js rejects every request with an `UntrustedHost` error and 500s on every page load. In production, `trustHost` is enabled via `NODE_ENV=production`.
-
 **`AUTH_SECRET`** must be set to any non-empty string. Auth.js uses it to encrypt session cookies. In production, use a strong random value (at least 32 characters).
+
+### Mock authentication (recommended for local dev)
+
+Setting **`MOCK_AUTH=true`** bypasses Auth.js OIDC entirely and injects a fake authenticated session. This means you can browse all protected routes without configuring BCeID or IDIR providers. The mock is implemented in `src/lib/server/mock-auth.ts` and is guarded by SvelteKit's `dev` flag — it refuses to load in production builds.
+
+You can control the mock session with two optional variables:
+
+| Variable | Default | Effect |
+|---|---|---|
+| `MOCK_AUTH_ROLE` | `CLIENT` | Sets the session role. Use `WORKER` or `ADMIN` to test worker/admin routes. |
+| `MOCK_AUTH_USER` | `Dev User` | Display name shown in the UI greeting. |
+
+To test as a worker, for example:
+
+```dotenv
+MOCK_AUTH=true
+MOCK_AUTH_ROLE=WORKER
+MOCK_AUTH_USER=Test Worker
+```
+
+To disable mock auth and use real OIDC login, either remove `MOCK_AUTH` or set it to any value other than `true`.
 
 ## Start the Dev Server
 
@@ -91,7 +115,7 @@ npm run dev
 ## Common Issues
 
 **`UntrustedHost: Host must be trusted` (500 error on every page)**
-Your `.env` is missing `TRUST_HOST=true`. The auth config at `src/lib/server/auth.ts` uses this variable to allow localhost. Add it and restart the dev server.
+If `MOCK_AUTH=true`, this error should not occur (Auth.js is bypassed). If you are using real OIDC login (`MOCK_AUTH` unset), Auth.js in dev mode automatically trusts localhost — ensure you are running via `npm run dev` and not a production build.
 
 **`AUTH_SECRET` error on startup**
 `AUTH_SECRET` must be set in your `.env`. Any non-empty string works for local development.

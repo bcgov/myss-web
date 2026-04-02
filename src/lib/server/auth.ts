@@ -34,7 +34,6 @@ const IDIRProvider: OIDCConfig<Record<string, unknown>> = {
 export const { handle, signIn, signOut } = SvelteKitAuth({
     providers: [BCeIDProvider, BCServicesCardProvider, IDIRProvider],
     secret: process.env.AUTH_SECRET,
-    trustHost: process.env.NODE_ENV === 'production' || process.env.TRUST_HOST === 'true',
     callbacks: {
         async jwt({ token, account, profile }) {
             if (account && profile) {
