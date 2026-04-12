@@ -50,13 +50,12 @@ export interface ReplyResponse {
 // ---- HTTP helpers ----
 
 async function apiGet<T>(path: string, token: string, params?: Record<string, string>): Promise<T> {
-    const url = new URL(`${API_BASE_URL}${path}`);
+    let url = `${API_BASE_URL}${path}`;
     if (params) {
-        for (const [key, value] of Object.entries(params)) {
-            url.searchParams.set(key, value);
-        }
+        const qs = new URLSearchParams(params).toString();
+        if (qs) url += `?${qs}`;
     }
-    const response = await fetch(url.toString(), {
+    const response = await fetch(url, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
