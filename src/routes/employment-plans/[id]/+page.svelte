@@ -4,6 +4,8 @@
     import { getPlanDetail, type EPDetailResponse } from '$lib/api/employment-plans';
     import EPStatusBadge from '$lib/components/EPStatusBadge.svelte';
     import EPSignModal from '$lib/components/EPSignModal.svelte';
+    import { formatDate } from '$lib/utils/format-date';
+    import { getToken } from '$lib/utils/auth-token';
 
     let epId = $derived(Number(page.params.id));
 
@@ -11,22 +13,6 @@
     let loading = $state(true);
     let error: string | null = $state(null);
     let showSignModal = $state(false);
-
-    function getToken(): string {
-        return (typeof window !== 'undefined' && window.sessionStorage.getItem('auth_token')) ?? '';
-    }
-
-    function formatDate(isoString: string): string {
-        try {
-            return new Intl.DateTimeFormat('en-CA', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-            }).format(new Date(isoString));
-        } catch {
-            return isoString;
-        }
-    }
 
     async function loadPlan() {
         loading = true;

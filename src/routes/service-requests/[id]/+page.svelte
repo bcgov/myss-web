@@ -9,6 +9,8 @@
     } from '$lib/api/service-requests';
     import SRStatusBadge from '$lib/components/SRStatusBadge.svelte';
     import SRTimeline from '$lib/components/SRTimeline.svelte';
+    import { formatDate } from '$lib/utils/format-date';
+    import { getToken } from '$lib/utils/auth-token';
 
     let srId = $derived(page.params.id);
 
@@ -17,24 +19,6 @@
     let error: string | null = $state(null);
     let withdrawing = $state(false);
     let withdrawError: string | null = $state(null);
-
-    function getToken(): string {
-        return (typeof window !== 'undefined' && window.sessionStorage.getItem('auth_token')) ?? '';
-    }
-
-    function formatDate(isoString: string): string {
-        try {
-            return new Intl.DateTimeFormat('en-CA', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-            }).format(new Date(isoString));
-        } catch {
-            return isoString;
-        }
-    }
 
     onMount(async () => {
         try {

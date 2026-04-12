@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { MessageDetail } from '$lib/api/messages';
+    import { formatDate } from '$lib/utils/format-date';
 
     let {
         message = null,
@@ -14,20 +15,6 @@
     } = $props();
 
     let restartClicked: boolean = $state(false);
-
-    function formatDate(isoString: string): string {
-        try {
-            return new Intl.DateTimeFormat('en-CA', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-            }).format(new Date(isoString));
-        } catch {
-            return isoString;
-        }
-    }
 
     function handleRestart() {
         restartClicked = true;

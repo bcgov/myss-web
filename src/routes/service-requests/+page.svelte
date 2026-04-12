@@ -3,6 +3,8 @@
     import { listServiceRequests } from '$lib/api/service-requests';
     import SRStatusBadge from '$lib/components/SRStatusBadge.svelte';
     import type { SRSummary, SRListResponse } from '$lib/api/service-requests';
+    import { getToken } from '$lib/utils/auth-token';
+    import { formatDate } from '$lib/utils/format-date';
 
     let items: SRSummary[] = $state([]);
     let total = $state(0);
@@ -12,9 +14,6 @@
     let page = $state(1);
     const pageSize = 20;
 
-    function getToken(): string {
-        return (typeof window !== 'undefined' && window.sessionStorage.getItem('auth_token')) ?? '';
-    }
 
     async function fetchSRs(currentPage: number) {
         try {
@@ -40,18 +39,6 @@
         page += 1;
         await fetchSRs(page);
         loadingMore = false;
-    }
-
-    function formatDate(isoString: string): string {
-        try {
-            return new Intl.DateTimeFormat('en-CA', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-            }).format(new Date(isoString));
-        } catch {
-            return isoString;
-        }
     }
 
     let hasMore = $derived(items.length < total);

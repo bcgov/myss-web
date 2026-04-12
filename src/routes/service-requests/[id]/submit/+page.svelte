@@ -4,6 +4,7 @@
         submitServiceRequest,
         type SRSubmitResponse,
     } from '$lib/api/service-requests';
+    import { getToken } from '$lib/utils/auth-token';
 
     let srId = $derived(page.params.id);
 
@@ -15,9 +16,6 @@
     let error: string | null = $state(null);
     let successResponse: SRSubmitResponse | null = $state(null);
 
-    function getToken(): string {
-        return (typeof window !== 'undefined' && window.sessionStorage.getItem('auth_token')) ?? '';
-    }
 
     let canSubmit = $derived(declarationAccepted && pin.trim().length > 0 && !submitting);
 

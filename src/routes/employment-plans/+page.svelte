@@ -3,26 +3,13 @@
     import { goto } from '$app/navigation';
     import { listPlans, type EmploymentPlan } from '$lib/api/employment-plans';
     import EPStatusBadge from '$lib/components/EPStatusBadge.svelte';
+    import { formatDate } from '$lib/utils/format-date';
+    import { getToken } from '$lib/utils/auth-token';
 
     let plans: EmploymentPlan[] = $state([]);
     let loading = $state(true);
     let error: string | null = $state(null);
 
-    function getToken(): string {
-        return (typeof window !== 'undefined' && window.sessionStorage.getItem('auth_token')) ?? '';
-    }
-
-    function formatDate(isoString: string): string {
-        try {
-            return new Intl.DateTimeFormat('en-CA', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-            }).format(new Date(isoString));
-        } catch {
-            return isoString;
-        }
-    }
 
     async function fetchPlans() {
         const token = getToken();

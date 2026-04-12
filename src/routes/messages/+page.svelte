@@ -12,6 +12,7 @@
     import MessageInbox from '$lib/components/MessageInbox.svelte';
     import MessageDetailComponent from '$lib/components/MessageDetail.svelte';
     import ReplyForm from '$lib/components/ReplyForm.svelte';
+    import { getToken } from '$lib/utils/auth-token';
 
     let banners: BannerNotification[] = $state([]);
     let messages: MessageSummary[] = $state([]);
@@ -32,9 +33,6 @@
     // Incrementing this counter triggers ReplyForm to reset via $effect
     let replyResetSignal = $state(0);
 
-    function getToken(): string {
-        return (typeof window !== 'undefined' && window.sessionStorage.getItem('auth_token')) ?? '';
-    }
 
     async function fetchBanners() {
         try {

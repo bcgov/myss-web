@@ -10,6 +10,8 @@
     } from '$lib/api/payment';
     import PaymentSummary from '$lib/components/PaymentSummary.svelte';
     import T5SlipList from '$lib/components/T5SlipList.svelte';
+    import { formatDate } from '$lib/utils/format-date';
+    import { getToken } from '$lib/utils/auth-token';
 
     let paymentInfo: PaymentInfoResponse | null = $state(null);
     let chequeSchedule: ChequeScheduleResponse | null = $state(null);
@@ -17,22 +19,6 @@
 
     let loading = $state(true);
     let error: string | null = $state(null);
-
-    function getToken(): string {
-        return (typeof window !== 'undefined' && window.sessionStorage.getItem('auth_token')) ?? '';
-    }
-
-    function formatDate(isoString: string): string {
-        try {
-            return new Intl.DateTimeFormat('en-CA', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-            }).format(new Date(isoString));
-        } catch {
-            return isoString;
-        }
-    }
 
     async function fetchAll() {
         const token = getToken();

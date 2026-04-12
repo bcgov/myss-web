@@ -5,6 +5,7 @@
     import { getAnswers, saveAnswers } from '$lib/api/monthly-reports';
     import DynamicForm from '$lib/components/DynamicForm.svelte';
     import type { DynamicFormSchema } from '$lib/api/service-requests';
+    import { getToken } from '$lib/utils/auth-token';
 
     let sd81Id = $derived(page.params.id);
 
@@ -17,9 +18,6 @@
     let saveSuccess = $state(false);
     let error: string | null = $state(null);
 
-    function getToken(): string {
-        return (typeof window !== 'undefined' && window.sessionStorage.getItem('auth_token')) ?? '';
-    }
 
     onMount(async () => {
         await loadData();

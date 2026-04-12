@@ -7,6 +7,7 @@
         type SRTypeMetadata,
         type SRType,
     } from '$lib/api/service-requests';
+    import { getToken } from '$lib/utils/auth-token';
 
     let eligibleTypes: SRTypeMetadata[] = $state([]);
     let selectedType: SRType | '' = $state('');
@@ -18,9 +19,6 @@
     // would derive this from user session/profile.
     const caseStatus = 'ACTIVE';
 
-    function getToken(): string {
-        return (typeof window !== 'undefined' && window.sessionStorage.getItem('auth_token')) ?? '';
-    }
 
     onMount(async () => {
         try {

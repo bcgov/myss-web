@@ -12,6 +12,7 @@
     } from '$lib/api/monthly-reports';
     import SD81StatusBadge from '$lib/components/SD81StatusBadge.svelte';
     import ReportingPeriodBanner from '$lib/components/ReportingPeriodBanner.svelte';
+    import { getToken } from '$lib/utils/auth-token';
 
     let period: ChequeScheduleWindow | null = $state(null);
     let reports: SD81Summary[] = $state([]);
@@ -21,9 +22,6 @@
     // Track which report IDs have a restart in-flight
     let restartingIds = $state(new Set<string>());
 
-    function getToken(): string {
-        return (typeof window !== 'undefined' && window.sessionStorage.getItem('auth_token')) ?? '';
-    }
 
     function formatMonth(dateStr: string): string {
         try {

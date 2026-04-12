@@ -2,6 +2,8 @@
     import { onMount } from 'svelte';
     import { aoLogin, listIAApplications } from '$lib/api/admin';
     import type { AOLoginResponse, IAApplication } from '$lib/api/admin';
+    import { formatDate } from '$lib/utils/format-date';
+    import { getToken } from '$lib/utils/auth-token';
 
     // ---- AO Login form state ----
     let srNumber = $state('');
@@ -15,10 +17,6 @@
     let appsLoading = $state(false);
     let appsError: string | null = $state(null);
 
-    function getToken(): string {
-        if (typeof window === 'undefined') return '';
-        return window.sessionStorage.getItem('auth_token') ?? '';
-    }
 
     async function handleLogin(event: SubmitEvent) {
         event.preventDefault();
@@ -56,17 +54,6 @@
         appsError = null;
     }
 
-    function formatDate(isoString: string): string {
-        try {
-            return new Intl.DateTimeFormat('en-CA', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-            }).format(new Date(isoString));
-        } catch {
-            return isoString;
-        }
-    }
 </script>
 
 <svelte:head>

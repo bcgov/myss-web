@@ -10,6 +10,7 @@
         type SRType,
     } from '$lib/api/service-requests';
     import DynamicForm from '$lib/components/DynamicForm.svelte';
+    import { getToken } from '$lib/utils/auth-token';
 
     let srId = $derived(page.params.id);
 
@@ -21,9 +22,6 @@
     let error: string | null = $state(null);
     let saveSuccess = $state(false);
 
-    function getToken(): string {
-        return (typeof window !== 'undefined' && window.sessionStorage.getItem('auth_token')) ?? '';
-    }
 
     // sr_type is passed as a query param (e.g., /service-requests/SR-001/form?sr_type=ASSIST)
     let srType = $derived((page.url.searchParams.get('sr_type') ?? 'ASSIST') as SRType);

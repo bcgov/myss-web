@@ -1,19 +1,8 @@
 <script lang="ts">
     import type { ChequeScheduleWindow } from '$lib/api/monthly-reports';
+    import { formatDate } from '$lib/utils/format-date';
 
     let { period }: { period: ChequeScheduleWindow } = $props();
-
-    function formatDate(dateStr: string): string {
-        try {
-            return new Intl.DateTimeFormat('en-CA', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-            }).format(new Date(dateStr));
-        } catch {
-            return dateStr;
-        }
-    }
 
     function formatMonth(dateStr: string): string {
         try {

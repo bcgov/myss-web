@@ -1,20 +1,9 @@
 <script lang="ts">
     import type { PaymentInfoResponse } from '$lib/api/payment';
     import BenefitCodeLabel from '$lib/components/BenefitCodeLabel.svelte';
+    import { formatDate } from '$lib/utils/format-date';
 
     let { data }: { data: PaymentInfoResponse } = $props();
-
-    function formatDate(isoString: string): string {
-        try {
-            return new Intl.DateTimeFormat('en-CA', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-            }).format(new Date(isoString));
-        } catch {
-            return isoString;
-        }
-    }
 
     function formatCurrency(amount: number): string {
         return new Intl.NumberFormat('en-CA', {

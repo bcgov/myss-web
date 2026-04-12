@@ -4,6 +4,7 @@
     import { page } from '$app/state';
     import SupportViewBanner from '$lib/components/SupportViewBanner.svelte';
     import { endTombstone, getClientData } from '$lib/api/admin';
+    import { getToken } from '$lib/utils/auth-token';
 
     // The [client] param holds the bceid_guid of the impersonated client
     let clientBceidGuid = $derived(page.params.client ?? '');
@@ -36,10 +37,6 @@
     let error: string | null = $state(null);
     let endingSession = $state(false);
 
-    function getToken(): string {
-        if (typeof window === 'undefined') return '';
-        return window.sessionStorage.getItem('auth_token') ?? '';
-    }
 
     onMount(async () => {
         try {

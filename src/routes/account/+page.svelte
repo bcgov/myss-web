@@ -4,6 +4,7 @@
     import ContactEditForm from '$lib/components/ContactEditForm.svelte';
     import PINChangeForm from '$lib/components/PINChangeForm.svelte';
     import CaseMemberList from '$lib/components/CaseMemberList.svelte';
+    import { getToken } from '$lib/utils/auth-token';
 
     let profile: AccountInfoResponse | null = $state(null);
     let members: CaseMember[] = $state([]);
@@ -12,9 +13,6 @@
     let error: string | null = $state(null);
     let token = $state('');
 
-    function getToken(): string {
-        return (typeof window !== 'undefined' && window.sessionStorage.getItem('auth_token')) ?? '';
-    }
 
     async function fetchAll() {
         token = getToken();

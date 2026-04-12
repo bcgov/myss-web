@@ -8,6 +8,7 @@
         type SD81SubmitResponse,
     } from '$lib/api/monthly-reports';
     import ReportingPeriodBanner from '$lib/components/ReportingPeriodBanner.svelte';
+    import { getToken } from '$lib/utils/auth-token';
 
     let sd81Id = $derived(page.params.id);
 
@@ -19,9 +20,6 @@
     let error: string | null = $state(null);
     let successResponse: SD81SubmitResponse | null = $state(null);
 
-    function getToken(): string {
-        return (typeof window !== 'undefined' && window.sessionStorage.getItem('auth_token')) ?? '';
-    }
 
     let periodClosed = $derived(period ? new Date(period.period_close_date) < new Date() : false);
     let canSubmit = $derived(pin.trim().length > 0 && !submitting && !periodClosed);
