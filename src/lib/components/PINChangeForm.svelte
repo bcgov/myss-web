@@ -1,5 +1,6 @@
 <script lang="ts">
     import { changePin } from '$lib/api/account';
+    import Alert from '$lib/components/Alert.svelte';
 
     let { token }: { token: string } = $props();
 
@@ -55,11 +56,11 @@
     <h2>Change PIN</h2>
 
     {#if error}
-        <div class="alert alert-error" role="alert">{error}</div>
+        <Alert variant="error">{error}</Alert>
     {/if}
 
     {#if success}
-        <div class="alert alert-success" role="status">{success}</div>
+        <Alert variant="success">{success}</Alert>
     {/if}
 
     <form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }} novalidate>
@@ -133,25 +134,6 @@
         color: #003366;
         margin: 0 0 1rem;
         font-weight: 700;
-    }
-
-    .alert {
-        padding: 0.75rem 1rem;
-        border-radius: 4px;
-        font-size: 0.9rem;
-        margin-bottom: 1rem;
-    }
-
-    .alert-error {
-        background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-    }
-
-    .alert-success {
-        background: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
     }
 
     form {
