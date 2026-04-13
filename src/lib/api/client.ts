@@ -14,11 +14,11 @@ export class ApiError extends Error {
 }
 
 function buildHeaders(token: string, extra?: Record<string, string>): Record<string, string> {
-    return {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-        ...extra,
-    };
+    const headers: Record<string, string> = { 'Content-Type': 'application/json', ...extra };
+    if (token) {
+        headers.Authorization = `Bearer ${token}`;
+    }
+    return headers;
 }
 
 async function handleResponse<T>(response: Response): Promise<T> {
@@ -36,6 +36,7 @@ export async function apiGet<T>(
     path: string,
     token: string,
     params?: Record<string, string>,
+    headers?: Record<string, string>,
 ): Promise<T> {
     let url = `${API_BASE_URL}${path}`;
     if (params) {
@@ -44,7 +45,7 @@ export async function apiGet<T>(
     }
     const response = await fetch(url, {
         method: 'GET',
-        headers: buildHeaders(token),
+        headers: buildHeaders(token, headers),
     });
     return handleResponse<T>(response);
 }
@@ -91,10 +92,11 @@ export async function apiPatch<T>(
 export async function apiDelete<T>(
     path: string,
     token: string,
+    headers?: Record<string, string>,
 ): Promise<T> {
     const response = await fetch(`${API_BASE_URL}${path}`, {
         method: 'DELETE',
-        headers: buildHeaders(token),
+        headers: buildHeaders(token, headers),
     });
     return handleResponse<T>(response);
 }

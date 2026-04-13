@@ -79,7 +79,9 @@ export async function endTombstone(
     token: string,
     clientBceidGuid: string,
 ): Promise<void> {
-    return apiDelete<void>('/admin/support-view/tombstone', token);
+    return apiDelete<void>('/admin/support-view/tombstone', token, {
+        'X-Support-View-Client': clientBceidGuid,
+    });
 }
 
 /** Fetch client data for a specific resource while in support-view mode. */
@@ -88,7 +90,9 @@ export async function getClientData<T = unknown>(
     resource: string,
     clientBceidGuid: string,
 ): Promise<T> {
-    return apiGet<T>(`/admin/support-view/client-data/${resource}`, token);
+    return apiGet<T>(`/admin/support-view/client-data/${resource}`, token, undefined, {
+        'X-Support-View-Client': clientBceidGuid,
+    });
 }
 
 /** Perform AO login with SR number and SIN. */

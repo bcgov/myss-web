@@ -51,6 +51,28 @@ describe('API client', () => {
             });
             await expect(apiGet('/missing', 'tok')).rejects.toThrow('404');
         });
+
+        it('passes extra headers', async () => {
+            mockFetch.mockResolvedValue({
+                ok: true,
+                status: 200,
+                json: () => Promise.resolve({}),
+            });
+            await apiGet('/items', 'tok', undefined, { 'X-Custom': 'val' });
+            expect(mockFetch.mock.calls[0][1].headers).toMatchObject({ 'X-Custom': 'val' });
+        });
+
+        it('omits Authorization when token is empty', async () => {
+            mockFetch.mockResolvedValue({
+                ok: true,
+                status: 200,
+                json: () => Promise.resolve({}),
+            });
+            await apiGet('/public', '');
+            const headers = mockFetch.mock.calls[0][1].headers;
+            expect(headers.Authorization).toBeUndefined();
+            expect(headers['Content-Type']).toBe('application/json');
+        });
     });
 
     describe('apiPost', () => {
