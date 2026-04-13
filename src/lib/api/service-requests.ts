@@ -1,5 +1,5 @@
 // src/lib/api/service-requests.ts
-import { API_BASE_URL } from '$lib/api/client';
+import { apiGet, apiPost, apiPut } from '$lib/api/client';
 
 // ---- Dynamic form types ----
 export type DynamicFormType = 'SR' | 'MONTHLY_REPORT' | 'APPLICATION';
@@ -87,26 +87,6 @@ export interface SRTypeMetadata {
     max_active: number;
 }
 
-async function apiGet<T>(path: string, token: string, params?: Record<string, string>): Promise<T> {
-    let url = `${API_BASE_URL}${path}`;
-    if (params) {
-        const qs = new URLSearchParams(params).toString();
-        if (qs) url += `?${qs}`;
-    }
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-        },
-    });
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
-        throw new Error(`Request failed (${response.status}): ${JSON.stringify(error)}`);
-    }
-    return response.json() as Promise<T>;
-}
-
 export async function listServiceRequests(
     token: string,
     page: number = 1,
@@ -125,40 +105,6 @@ export async function getEligibleTypes(
     return apiGet<SRTypeMetadata[]>('/service-requests/eligible-types', token, {
         case_status: caseStatus,
     });
-}
-
-async function apiPost<T>(path: string, token: string, body: unknown): Promise<T> {
-    const url = `${API_BASE_URL}${path}`;
-    const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
-    });
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
-        throw new Error(`Request failed (${response.status}): ${JSON.stringify(error)}`);
-    }
-    return response.json() as Promise<T>;
-}
-
-async function apiPut<T>(path: string, token: string, body: unknown): Promise<T> {
-    const url = `${API_BASE_URL}${path}`;
-    const response = await fetch(url, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
-    });
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
-        throw new Error(`Request failed (${response.status}): ${JSON.stringify(error)}`);
-    }
-    return response.json() as Promise<T>;
 }
 
 export async function createServiceRequest(
@@ -236,14 +182,5 @@ export async function withdrawServiceRequest(
     srId: string,
     reason?: string,
 ): Promise<void> {
-    const url = `${API_BASE_URL}/service-requests/${srId}/withdraw`;
-    const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ reason: reason ?? null }),
-    });
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
-        throw new Error(`Request failed (${response.status}): ${JSON.stringify(error)}`);
-    }
+    await apiPost<void>(`/service-requests/${srId}/withdraw`, token, { reason: reason ?? null });
 }
