@@ -3,26 +3,14 @@
     import { goto } from '$app/navigation';
     import { listPlans, type EmploymentPlan } from '$lib/api/employment-plans';
     import EPStatusBadge from '$lib/components/EPStatusBadge.svelte';
+    import LoadingState from '$lib/components/LoadingState.svelte';
+    import { formatDate } from '$lib/utils/format-date';
+    import { getToken } from '$lib/utils/auth-token';
 
     let plans: EmploymentPlan[] = $state([]);
     let loading = $state(true);
     let error: string | null = $state(null);
 
-    function getToken(): string {
-        return (typeof window !== 'undefined' && window.sessionStorage.getItem('auth_token')) ?? '';
-    }
-
-    function formatDate(isoString: string): string {
-        try {
-            return new Intl.DateTimeFormat('en-CA', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-            }).format(new Date(isoString));
-        } catch {
-            return isoString;
-        }
-    }
 
     async function fetchPlans() {
         const token = getToken();
@@ -81,16 +69,7 @@
 <main class="ep-list-page">
     <h1>Employment Plans</h1>
 
-    {#if loading}
-        <p class="loading" aria-live="polite">Loading employment plans...</p>
-    {:else if error}
-        <div class="error" role="alert">
-            <p>{error}</p>
-            <button onclick={handleRetry}>Try again</button>
-        </div>
-    {:else if plans.length === 0}
-        <p class="empty">No employment plans found.</p>
-    {:else}
+    <LoadingState {loading} {error} empty={plans.length === 0} emptyMessage="No employment plans found.">
         <table class="ep-table">
             <thead>
                 <tr>
@@ -116,7 +95,7 @@
                 {/each}
             </tbody>
         </table>
-    {/if}
+    </LoadingState>
 </main>
 
 <style>
@@ -131,41 +110,6 @@
         font-size: 1.75rem;
         color: #003366;
         margin-bottom: 1.25rem;
-    }
-
-    .loading,
-    .empty {
-        color: #555;
-        font-style: italic;
-    }
-
-    .error {
-        background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-        border-radius: 4px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .error p {
-        margin: 0 0 0.5rem;
-    }
-
-    .error button {
-        padding: 0.4rem 0.8rem;
-        cursor: pointer;
-        background: white;
-        border: 1px solid #721c24;
-        border-radius: 4px;
-        color: #721c24;
-        font-size: 0.9rem;
-        font-family: inherit;
-    }
-
-    .error button:hover {
-        background: #721c24;
-        color: white;
     }
 
     .ep-table {

@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { MessageSummary } from '$lib/api/messages';
+    import { formatDate } from '$lib/utils/format-date';
 
     let {
         messages = [],
@@ -20,18 +21,6 @@
     function handleSelect(messageId: string) {
         selectedId = messageId;
         onselect?.(messageId);
-    }
-
-    function formatDate(isoString: string): string {
-        try {
-            return new Intl.DateTimeFormat('en-CA', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-            }).format(new Date(isoString));
-        } catch {
-            return isoString;
-        }
     }
 
     let hasMore = $derived(messages.length < total);

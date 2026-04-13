@@ -1,5 +1,5 @@
 // src/lib/api/registration.ts
-import { API_BASE_URL } from '$lib/api/client';
+import { apiPost } from '$lib/api/client';
 
 export type AccountCreationType = 'SELF' | 'WITH_HELPER' | 'POA' | 'PARENT';
 
@@ -37,23 +37,10 @@ export interface StepResponse {
     next_step: number;
 }
 
-async function apiPost<T>(path: string, body: unknown): Promise<T> {
-    const response = await fetch(`${API_BASE_URL}${path}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-    });
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
-        throw new Error(`Request failed (${response.status}): ${JSON.stringify(error)}`);
-    }
-    return response.json() as Promise<T>;
-}
-
 export async function startRegistration(
     accountCreationType: AccountCreationType,
 ): Promise<StartRegistrationResponse> {
-    return apiPost<StartRegistrationResponse>('/registration/start', {
+    return apiPost<StartRegistrationResponse>('/registration/start', '', {
         account_creation_type: accountCreationType,
     });
 }
@@ -62,7 +49,7 @@ export async function savePersonalInfo(
     token: string,
     payload: PersonalInfoPayload,
 ): Promise<StepResponse> {
-    return apiPost<StepResponse>(`/registration/${token}/personal-info`, payload);
+    return apiPost<StepResponse>(`/registration/${token}/personal-info`, '', payload);
 }
 
 export async function savePin(
@@ -70,7 +57,7 @@ export async function savePin(
     pin: string,
     pinConfirm: string,
 ): Promise<StepResponse> {
-    return apiPost<StepResponse>(`/registration/${token}/pin`, {
+    return apiPost<StepResponse>(`/registration/${token}/pin`, '', {
         pin,
         pin_confirm: pinConfirm,
     });

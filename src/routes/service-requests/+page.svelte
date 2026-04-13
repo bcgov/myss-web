@@ -2,7 +2,10 @@
     import { onMount } from 'svelte';
     import { listServiceRequests } from '$lib/api/service-requests';
     import SRStatusBadge from '$lib/components/SRStatusBadge.svelte';
+    import LoadingState from '$lib/components/LoadingState.svelte';
     import type { SRSummary, SRListResponse } from '$lib/api/service-requests';
+    import { getToken } from '$lib/utils/auth-token';
+    import { formatDate } from '$lib/utils/format-date';
 
     let items: SRSummary[] = $state([]);
     let total = $state(0);
@@ -12,9 +15,6 @@
     let page = $state(1);
     const pageSize = 20;
 
-    function getToken(): string {
-        return (typeof window !== 'undefined' && window.sessionStorage.getItem('auth_token')) ?? '';
-    }
 
     async function fetchSRs(currentPage: number) {
         try {
@@ -42,18 +42,6 @@
         loadingMore = false;
     }
 
-    function formatDate(isoString: string): string {
-        try {
-            return new Intl.DateTimeFormat('en-CA', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-            }).format(new Date(isoString));
-        } catch {
-            return isoString;
-        }
-    }
-
     let hasMore = $derived(items.length < total);
 </script>
 
@@ -64,16 +52,7 @@
 <main class="sr-list">
     <h1>My Service Requests</h1>
 
-    {#if loading}
-        <p class="loading">Loading service requests...</p>
-    {:else if error}
-        <div class="error" role="alert">
-            <p>{error}</p>
-            <button onclick={() => { error = null; loading = true; page = 1; fetchSRs(1).then(() => { loading = false; }); }}>Try again</button>
-        </div>
-    {:else if items.length === 0}
-        <p class="empty">You have no service requests on file.</p>
-    {:else}
+    <LoadingState {loading} {error} empty={items.length === 0} emptyMessage="You have no service requests on file.">
         <p class="summary">
             Showing {items.length} of {total} service request{total !== 1 ? 's' : ''}
         </p>
@@ -111,7 +90,7 @@
                 </button>
             </div>
         {/if}
-    {/if}
+    </LoadingState>
 </main>
 
 <style>
@@ -126,27 +105,6 @@
         font-size: 1.75rem;
         margin-bottom: 1rem;
         color: #003366;
-    }
-
-    .loading,
-    .empty {
-        color: #555;
-        font-style: italic;
-    }
-
-    .error {
-        background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-        border-radius: 4px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .error button {
-        margin-top: 0.5rem;
-        padding: 0.4rem 0.8rem;
-        cursor: pointer;
     }
 
     .summary {

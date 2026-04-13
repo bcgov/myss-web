@@ -1,5 +1,5 @@
 // src/lib/api/payment.ts
-import { API_BASE_URL } from '$lib/api/client';
+import { apiGet } from '$lib/api/client';
 
 // ---- Types ----
 
@@ -62,24 +62,6 @@ export interface T5Slip {
 
 export interface T5SlipList {
     slips: T5Slip[];
-}
-
-// ---- HTTP helpers ----
-
-async function apiGet<T>(path: string, token: string): Promise<T> {
-    const url = `${API_BASE_URL}${path}`;
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-        },
-    });
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
-        throw new Error(`Request failed (${response.status}): ${JSON.stringify(error)}`);
-    }
-    return response.json() as Promise<T>;
 }
 
 // ---- API functions ----

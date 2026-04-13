@@ -10,6 +10,9 @@
     } from '$lib/api/payment';
     import PaymentSummary from '$lib/components/PaymentSummary.svelte';
     import T5SlipList from '$lib/components/T5SlipList.svelte';
+    import LoadingState from '$lib/components/LoadingState.svelte';
+    import { formatDate } from '$lib/utils/format-date';
+    import { getToken } from '$lib/utils/auth-token';
 
     let paymentInfo: PaymentInfoResponse | null = $state(null);
     let chequeSchedule: ChequeScheduleResponse | null = $state(null);
@@ -17,22 +20,6 @@
 
     let loading = $state(true);
     let error: string | null = $state(null);
-
-    function getToken(): string {
-        return (typeof window !== 'undefined' && window.sessionStorage.getItem('auth_token')) ?? '';
-    }
-
-    function formatDate(isoString: string): string {
-        try {
-            return new Intl.DateTimeFormat('en-CA', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-            }).format(new Date(isoString));
-        } catch {
-            return isoString;
-        }
-    }
 
     async function fetchAll() {
         const token = getToken();
@@ -96,14 +83,7 @@
 <main class="payment-info-page">
     <h1>Payment Information</h1>
 
-    {#if loading}
-        <p class="loading" aria-live="polite">Loading payment information...</p>
-    {:else if error}
-        <div class="error" role="alert">
-            <p>{error}</p>
-            <button onclick={handleRetry}>Try again</button>
-        </div>
-    {:else}
+    <LoadingState {loading} {error}>
         <!-- Cheque Schedule Banner -->
         {#if chequeSchedule}
             <div class="schedule-banner">
@@ -130,7 +110,7 @@
 
         <!-- T5 Slips -->
         <T5SlipList slips={t5Slips} token={getToken()} />
-    {/if}
+    </LoadingState>
 </main>
 
 <style>
@@ -147,39 +127,9 @@
         margin-bottom: 1.25rem;
     }
 
-    .loading,
     .empty {
         color: #555;
         font-style: italic;
-    }
-
-    .error {
-        background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-        border-radius: 4px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .error p {
-        margin: 0 0 0.5rem;
-    }
-
-    .error button {
-        padding: 0.4rem 0.8rem;
-        cursor: pointer;
-        background: white;
-        border: 1px solid #721c24;
-        border-radius: 4px;
-        color: #721c24;
-        font-size: 0.9rem;
-        font-family: inherit;
-    }
-
-    .error button:hover {
-        background: #721c24;
-        color: white;
     }
 
     .schedule-banner {

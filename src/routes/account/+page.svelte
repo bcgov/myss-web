@@ -4,6 +4,8 @@
     import ContactEditForm from '$lib/components/ContactEditForm.svelte';
     import PINChangeForm from '$lib/components/PINChangeForm.svelte';
     import CaseMemberList from '$lib/components/CaseMemberList.svelte';
+    import LoadingState from '$lib/components/LoadingState.svelte';
+    import { getToken } from '$lib/utils/auth-token';
 
     let profile: AccountInfoResponse | null = $state(null);
     let members: CaseMember[] = $state([]);
@@ -12,9 +14,6 @@
     let error: string | null = $state(null);
     let token = $state('');
 
-    function getToken(): string {
-        return (typeof window !== 'undefined' && window.sessionStorage.getItem('auth_token')) ?? '';
-    }
 
     async function fetchAll() {
         token = getToken();
@@ -75,22 +74,15 @@
 <main class="account-page">
     <h1>My Account</h1>
 
-    {#if loading}
-        <p class="loading" aria-live="polite">Loading account information...</p>
-    {:else if error}
-        <div class="error" role="alert">
-            <p>{error}</p>
-            <button onclick={handleRetry}>Try again</button>
-        </div>
-    {:else if profile}
+    <LoadingState {loading} {error} empty={!profile} emptyMessage="No account information available.">
         <!-- Case summary banner -->
         <div class="case-banner">
             <dl class="case-grid">
-                {#if profile.case_number}
+                {#if profile?.case_number}
                     <dt>Case Number</dt>
                     <dd>{profile.case_number}</dd>
                 {/if}
-                {#if profile.case_status}
+                {#if profile?.case_status}
                     <dt>Case Status</dt>
                     <dd>{profile.case_status}</dd>
                 {/if}
@@ -103,9 +95,7 @@
             <PINChangeForm {token} />
             <CaseMemberList {members} />
         </div>
-    {:else}
-        <p class="empty">No account information available.</p>
-    {/if}
+    </LoadingState>
 </main>
 
 <style>
@@ -120,41 +110,6 @@
         font-size: 1.75rem;
         color: #003366;
         margin-bottom: 1.25rem;
-    }
-
-    .loading,
-    .empty {
-        color: #555;
-        font-style: italic;
-    }
-
-    .error {
-        background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-        border-radius: 4px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .error p {
-        margin: 0 0 0.5rem;
-    }
-
-    .error button {
-        padding: 0.4rem 0.8rem;
-        cursor: pointer;
-        background: white;
-        border: 1px solid #721c24;
-        border-radius: 4px;
-        color: #721c24;
-        font-size: 0.9rem;
-        font-family: inherit;
-    }
-
-    .error button:hover {
-        background: #721c24;
-        color: white;
     }
 
     .case-banner {

@@ -3,6 +3,7 @@
     import AdminClientSearch from '$lib/components/AdminClientSearch.svelte';
     import { searchClients, createTombstone } from '$lib/api/admin';
     import type { ClientSearchResult } from '$lib/api/admin';
+    import { getToken } from '$lib/utils/auth-token';
 
     const PAGE_SIZE = 10;
 
@@ -16,10 +17,6 @@
     let error: string | null = $state(null);
     let hasSearched = $state(false);
 
-    function getToken(): string {
-        if (typeof window === 'undefined') return '';
-        return window.sessionStorage.getItem('auth_token') ?? '';
-    }
 
     async function doSearch(params: { first_name: string; last_name: string; sin: string }, page: number) {
         try {
