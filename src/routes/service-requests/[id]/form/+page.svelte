@@ -10,6 +10,7 @@
         type SRType,
     } from '$lib/api/service-requests';
     import DynamicForm from '$lib/components/DynamicForm.svelte';
+    import LoadingState from '$lib/components/LoadingState.svelte';
     import { getToken } from '$lib/utils/auth-token';
 
     let srId = $derived(page.params.id);
@@ -105,14 +106,7 @@
     <h1>Service Request Form</h1>
     <p class="sr-id-label">SR ID: <code>{srId}</code></p>
 
-    {#if loading}
-        <p class="loading" aria-live="polite">Loading form...</p>
-    {:else if error}
-        <div class="error" role="alert">
-            <p>{error}</p>
-            <button onclick={loadSchemaAndDraft}>Try again</button>
-        </div>
-    {:else if schema}
+    <LoadingState {loading} {error} empty={!schema} emptyMessage="No form found for this service request.">
         {#if saveSuccess}
             <div class="save-success" role="status" aria-live="polite">
                 Draft saved successfully.
@@ -128,9 +122,7 @@
             onnext={handleNext}
             onback={handleBack}
         />
-    {:else}
-        <p class="empty">No form found for this service request.</p>
-    {/if}
+    </LoadingState>
 </main>
 
 <style>
@@ -169,27 +161,6 @@
         background: #f2f2f2;
         padding: 0.1rem 0.35rem;
         border-radius: 3px;
-    }
-
-    .loading,
-    .empty {
-        color: #555;
-        font-style: italic;
-    }
-
-    .error {
-        background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-        border-radius: 4px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .error button {
-        margin-top: 0.5rem;
-        padding: 0.4rem 0.8rem;
-        cursor: pointer;
     }
 
     .save-success {

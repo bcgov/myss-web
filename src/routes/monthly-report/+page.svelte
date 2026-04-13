@@ -12,6 +12,7 @@
     } from '$lib/api/monthly-reports';
     import SD81StatusBadge from '$lib/components/SD81StatusBadge.svelte';
     import ReportingPeriodBanner from '$lib/components/ReportingPeriodBanner.svelte';
+    import LoadingState from '$lib/components/LoadingState.svelte';
     import { getToken } from '$lib/utils/auth-token';
 
     let period: ChequeScheduleWindow | null = $state(null);
@@ -104,29 +105,7 @@
 <main class="monthly-report-page">
     <h1>Monthly Report</h1>
 
-    {#if loading}
-        <p class="loading" aria-live="polite">Loading monthly report information...</p>
-    {:else if error}
-        <div class="error" role="alert">
-            <p>{error}</p>
-            <button
-                onclick={() => {
-                    error = null;
-                    loading = true;
-                    Promise.allSettled([
-                        getCurrentPeriod(getToken()),
-                        listReports(getToken()),
-                    ]).then(([p, l]) => {
-                        if (p.status === 'fulfilled') period = p.value;
-                        if (l.status === 'fulfilled') reports = l.value.reports;
-                        loading = false;
-                    });
-                }}
-            >
-                Try again
-            </button>
-        </div>
-    {:else}
+    <LoadingState {loading} {error}>
         {#if period}
             <ReportingPeriodBanner {period} />
         {/if}
@@ -209,7 +188,7 @@
         {:else}
             <p class="empty">No monthly reports on file.</p>
         {/if}
-    {/if}
+    </LoadingState>
 </main>
 
 <style>
@@ -232,25 +211,9 @@
         margin-bottom: 0.75rem;
     }
 
-    .loading,
     .empty {
         color: #555;
         font-style: italic;
-    }
-
-    .error {
-        background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-        border-radius: 4px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .error button {
-        margin-top: 0.5rem;
-        padding: 0.4rem 0.8rem;
-        cursor: pointer;
     }
 
     .start-section {

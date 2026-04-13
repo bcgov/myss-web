@@ -9,6 +9,7 @@
     } from '$lib/api/service-requests';
     import SRStatusBadge from '$lib/components/SRStatusBadge.svelte';
     import SRTimeline from '$lib/components/SRTimeline.svelte';
+    import LoadingState from '$lib/components/LoadingState.svelte';
     import { formatDate } from '$lib/utils/format-date';
     import { getToken } from '$lib/utils/auth-token';
 
@@ -60,16 +61,7 @@
 
     <h1>Service Request Detail</h1>
 
-    {#if loading}
-        <p class="loading" aria-live="polite">Loading service request...</p>
-    {:else if error}
-        <div class="error" role="alert">
-            <p>{error}</p>
-            <button onclick={() => { error = null; loading = true; getServiceRequestDetail(getToken(), srId).then(d => { detail = d; loading = false; }).catch(e => { error = e instanceof Error ? e.message : 'Failed.'; loading = false; }); }}>
-                Try again
-            </button>
-        </div>
-    {:else if detail}
+    <LoadingState {loading} {error} empty={!detail} emptyMessage="Service request not found.">
         <div class="sr-card">
             <div class="sr-header">
                 <div>
@@ -146,14 +138,12 @@
             </div>
 
             {#if withdrawError}
-                <div class="error" role="alert">
+                <div class="withdraw-error" role="alert">
                     <p>{withdrawError}</p>
                 </div>
             {/if}
         </div>
-    {:else}
-        <p class="empty">Service request not found.</p>
-    {/if}
+    </LoadingState>
 </main>
 
 <style>
@@ -332,24 +322,12 @@
         cursor: not-allowed;
     }
 
-    .loading,
-    .empty {
-        color: #555;
-        font-style: italic;
-    }
-
-    .error {
+    .withdraw-error {
         background: #f8d7da;
         color: #721c24;
         border: 1px solid #f5c6cb;
         border-radius: 4px;
         padding: 1rem;
         margin-top: 1rem;
-    }
-
-    .error button {
-        margin-top: 0.5rem;
-        padding: 0.4rem 0.8rem;
-        cursor: pointer;
     }
 </style>

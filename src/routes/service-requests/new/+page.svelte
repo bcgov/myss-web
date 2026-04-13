@@ -7,6 +7,7 @@
         type SRTypeMetadata,
         type SRType,
     } from '$lib/api/service-requests';
+    import LoadingState from '$lib/components/LoadingState.svelte';
     import { getToken } from '$lib/utils/auth-token';
 
     let eligibleTypes: SRTypeMetadata[] = $state([]);
@@ -67,27 +68,7 @@
     <h1>Start a New Service Request</h1>
     <p class="intro">Select the type of service request you would like to submit.</p>
 
-    {#if loading}
-        <p class="loading" aria-live="polite">Loading available request types...</p>
-    {:else if error}
-        <div class="error" role="alert">
-            <p>{error}</p>
-            <button
-                onclick={() => {
-                    error = null;
-                    loading = true;
-                    getEligibleTypes(getToken(), caseStatus)
-                        .then((types) => { eligibleTypes = types; })
-                        .catch((e) => { error = e instanceof Error ? e.message : 'Unknown error'; })
-                        .finally(() => { loading = false; });
-                }}
-            >
-                Try again
-            </button>
-        </div>
-    {:else if eligibleTypes.length === 0}
-        <p class="empty">No service request types are currently available for your case.</p>
-    {:else}
+    <LoadingState {loading} {error} empty={eligibleTypes.length === 0} emptyMessage="No service request types are currently available for your case.">
         <form onsubmit={(e) => { e.preventDefault(); handleContinue(); }}>
             <fieldset>
                 <legend class="sr-only">Choose a service request type</legend>
@@ -138,7 +119,7 @@
                 </div>
             {/if}
         </form>
-    {/if}
+    </LoadingState>
 </main>
 
 <style>
@@ -169,12 +150,6 @@
     .intro {
         color: #555;
         margin-bottom: 1.5rem;
-    }
-
-    .loading,
-    .empty {
-        color: #555;
-        font-style: italic;
     }
 
     .error {

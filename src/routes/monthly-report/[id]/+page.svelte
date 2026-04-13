@@ -4,6 +4,7 @@
     import { goto } from '$app/navigation';
     import { getAnswers, saveAnswers } from '$lib/api/monthly-reports';
     import DynamicForm from '$lib/components/DynamicForm.svelte';
+    import LoadingState from '$lib/components/LoadingState.svelte';
     import type { DynamicFormSchema } from '$lib/api/service-requests';
     import { getToken } from '$lib/utils/auth-token';
 
@@ -149,14 +150,7 @@
     <h1>Monthly Report</h1>
     <p class="report-id-label">Report ID: <code>{sd81Id}</code></p>
 
-    {#if loading}
-        <p class="loading" aria-live="polite">Loading form...</p>
-    {:else if error}
-        <div class="error" role="alert">
-            <p>{error}</p>
-            <button onclick={loadData}>Try again</button>
-        </div>
-    {:else if schema}
+    <LoadingState {loading} {error} empty={!schema} emptyMessage="No form found for this report.">
         {#if saveSuccess}
             <div class="save-success" role="status" aria-live="polite">
                 Progress saved successfully.
@@ -172,9 +166,7 @@
             onnext={handleNext}
             onback={handleBack}
         />
-    {:else}
-        <p class="empty">No form found for this report.</p>
-    {/if}
+    </LoadingState>
 </main>
 
 <style>
@@ -213,27 +205,6 @@
         background: #f2f2f2;
         padding: 0.1rem 0.35rem;
         border-radius: 3px;
-    }
-
-    .loading,
-    .empty {
-        color: #555;
-        font-style: italic;
-    }
-
-    .error {
-        background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-        border-radius: 4px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .error button {
-        margin-top: 0.5rem;
-        padding: 0.4rem 0.8rem;
-        cursor: pointer;
     }
 
     .save-success {

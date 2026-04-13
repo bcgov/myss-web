@@ -4,6 +4,7 @@
     import { getPlanDetail, type EPDetailResponse } from '$lib/api/employment-plans';
     import EPStatusBadge from '$lib/components/EPStatusBadge.svelte';
     import EPSignModal from '$lib/components/EPSignModal.svelte';
+    import LoadingState from '$lib/components/LoadingState.svelte';
     import { formatDate } from '$lib/utils/format-date';
     import { getToken } from '$lib/utils/auth-token';
 
@@ -76,14 +77,7 @@
 
     <h1>Employment Plan</h1>
 
-    {#if loading}
-        <p class="loading" aria-live="polite">Loading employment plan...</p>
-    {:else if error}
-        <div class="error" role="alert">
-            <p>{error}</p>
-            <button onclick={loadPlan}>Try again</button>
-        </div>
-    {:else if plan}
+    <LoadingState {loading} {error} empty={!plan} emptyMessage="Employment plan not found.">
         <div class="plan-card">
             <dl class="plan-details">
                 <dt>Plan ID</dt>
@@ -131,9 +125,7 @@
                 </div>
             {/if}
         </div>
-    {:else}
-        <p class="empty">Employment plan not found.</p>
-    {/if}
+    </LoadingState>
 </main>
 
 <style>
@@ -159,41 +151,6 @@
         font-size: 1.75rem;
         color: #003366;
         margin-bottom: 1.25rem;
-    }
-
-    .loading,
-    .empty {
-        color: #555;
-        font-style: italic;
-    }
-
-    .error {
-        background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-        border-radius: 4px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .error p {
-        margin: 0 0 0.5rem;
-    }
-
-    .error button {
-        padding: 0.4rem 0.8rem;
-        cursor: pointer;
-        background: white;
-        border: 1px solid #721c24;
-        border-radius: 4px;
-        color: #721c24;
-        font-size: 0.9rem;
-        font-family: inherit;
-    }
-
-    .error button:hover {
-        background: #721c24;
-        color: white;
     }
 
     .plan-card {
