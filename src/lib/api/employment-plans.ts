@@ -1,5 +1,5 @@
 // src/lib/api/employment-plans.ts
-import { API_BASE_URL } from '$lib/api/client';
+import { apiGet, apiPost } from '$lib/api/client';
 
 // ---- Types ----
 
@@ -18,7 +18,7 @@ export interface EPListResponse {
     plans: EmploymentPlan[];
 }
 
-export interface EPDetailResponse extends EmploymentPlan {}
+export type EPDetailResponse = EmploymentPlan;
 
 export interface EPSignRequest {
     pin: string;
@@ -28,35 +28,6 @@ export interface EPSignRequest {
 export interface EPSignResponse {
     ep_id: number;
     signed_at: string;
-}
-
-// ---- HTTP helpers ----
-
-async function apiGet<T>(path: string, token: string): Promise<T> {
-    const url = `${API_BASE_URL}${path}`;
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    });
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
-        throw new Error(`Request failed (${response.status}): ${JSON.stringify(error)}`);
-    }
-    return response.json() as Promise<T>;
-}
-
-async function apiPost<T>(path: string, token: string, body: unknown): Promise<T> {
-    const url = `${API_BASE_URL}${path}`;
-    const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(body),
-    });
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
-        throw new Error(`Request failed (${response.status}): ${JSON.stringify(error)}`);
-    }
-    return response.json() as Promise<T>;
 }
 
 // ---- API functions ----

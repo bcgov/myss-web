@@ -1,5 +1,5 @@
 // src/lib/api/admin.ts
-import { API_BASE_URL } from '$lib/api/client';
+import { apiGet, apiPost, apiDelete } from '$lib/api/client';
 
 // ---- Types ----
 
@@ -54,79 +54,6 @@ export interface AOLoginResponse {
     sr_number: string;
 }
 
-// ---- HTTP helpers ----
-
-async function apiGet<T>(
-    path: string,
-    token: string,
-    extraHeaders?: Record<string, string>,
-): Promise<T> {
-    const url = `${API_BASE_URL}${path}`;
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-            ...extraHeaders,
-        },
-    });
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
-        throw new Error(`Request failed (${response.status}): ${JSON.stringify(error)}`);
-    }
-    return response.json() as Promise<T>;
-}
-
-async function apiPost<T>(
-    path: string,
-    token: string,
-    body: unknown,
-    extraHeaders?: Record<string, string>,
-): Promise<T> {
-    const url = `${API_BASE_URL}${path}`;
-    const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-            ...extraHeaders,
-        },
-        body: JSON.stringify(body),
-    });
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
-        throw new Error(`Request failed (${response.status}): ${JSON.stringify(error)}`);
-    }
-    if (response.status === 204) {
-        return undefined as T;
-    }
-    return response.json() as Promise<T>;
-}
-
-async function apiDelete<T>(
-    path: string,
-    token: string,
-    extraHeaders?: Record<string, string>,
-): Promise<T> {
-    const url = `${API_BASE_URL}${path}`;
-    const response = await fetch(url, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-            ...extraHeaders,
-        },
-    });
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
-        throw new Error(`Request failed (${response.status}): ${JSON.stringify(error)}`);
-    }
-    if (response.status === 204) {
-        return undefined as T;
-    }
-    return response.json() as Promise<T>;
-}
-
 // ---- API functions ----
 
 /** Search for clients by name/SIN. Returns a paginated list of matching clients. */
@@ -152,9 +79,7 @@ export async function endTombstone(
     token: string,
     clientBceidGuid: string,
 ): Promise<void> {
-    return apiDelete<void>('/admin/support-view/tombstone', token, {
-        'X-Support-View-Client': clientBceidGuid,
-    });
+    return apiDelete<void>('/admin/support-view/tombstone', token);
 }
 
 /** Fetch client data for a specific resource while in support-view mode. */
@@ -163,9 +88,7 @@ export async function getClientData<T = unknown>(
     resource: string,
     clientBceidGuid: string,
 ): Promise<T> {
-    return apiGet<T>(`/admin/support-view/client-data/${resource}`, token, {
-        'X-Support-View-Client': clientBceidGuid,
-    });
+    return apiGet<T>(`/admin/support-view/client-data/${resource}`, token);
 }
 
 /** Perform AO login with SR number and SIN. */

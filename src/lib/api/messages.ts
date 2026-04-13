@@ -1,5 +1,5 @@
 // src/lib/api/messages.ts
-import { API_BASE_URL } from '$lib/api/client';
+import { apiGet, apiPost, apiDelete } from '$lib/api/client';
 
 // ---- Types ----
 
@@ -45,60 +45,6 @@ export interface ReplyRequest {
 export interface ReplyResponse {
     status: string;
     sent_at: string;
-}
-
-// ---- HTTP helpers ----
-
-async function apiGet<T>(path: string, token: string, params?: Record<string, string>): Promise<T> {
-    let url = `${API_BASE_URL}${path}`;
-    if (params) {
-        const qs = new URLSearchParams(params).toString();
-        if (qs) url += `?${qs}`;
-    }
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-        },
-    });
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
-        throw new Error(`Request failed (${response.status}): ${JSON.stringify(error)}`);
-    }
-    return response.json() as Promise<T>;
-}
-
-async function apiPost<T>(path: string, token: string, body: unknown): Promise<T> {
-    const url = `${API_BASE_URL}${path}`;
-    const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
-    });
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
-        throw new Error(`Request failed (${response.status}): ${JSON.stringify(error)}`);
-    }
-    return response.json() as Promise<T>;
-}
-
-async function apiDelete(path: string, token: string): Promise<void> {
-    const url = `${API_BASE_URL}${path}`;
-    const response = await fetch(url, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-        },
-    });
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
-        throw new Error(`Request failed (${response.status}): ${JSON.stringify(error)}`);
-    }
 }
 
 // ---- API functions ----
