@@ -29,12 +29,23 @@ PUBLIC_API_URL=http://localhost:8000
 AUTH_SECRET=local-dev-secret
 TRUST_HOST=true
 
-# Mock auth — bypass OIDC login for local development
+# Mock auth — bypass OIDC login using one of four seeded personas.
+# All three of these must be set for mock auth to activate
+# (the runtime safety gate refuses otherwise; see "Mock authentication" below).
+PUBLIC_ENVIRONMENT_NAME=DEV1
+PUBLIC_ALLOW_MOCK_AUTH=true
 MOCK_AUTH=true
-# MOCK_AUTH_ROLE=CLIENT   # CLIENT (default), WORKER, or ADMIN
-# MOCK_AUTH_USER=Dev User # Display name for the mock session
 
-# Keycloak / BCeID OIDC (only needed if MOCK_AUTH is not true)
+# Starting persona — DevPersonaSwitcher toolbar lets you change at runtime.
+MOCK_AUTH_PERSONA=alice
+
+# Persona JWTs (paste from `python scripts/seed_db.py` in myss-api).
+MOCK_AUTH_TOKEN_ALICE=
+MOCK_AUTH_TOKEN_BOB=
+MOCK_AUTH_TOKEN_CAROL=
+MOCK_AUTH_TOKEN_WORKER=
+
+# Keycloak / BCeID OIDC (only needed if mock auth is NOT active)
 AUTH_KEYCLOAK_ID=myss-web
 AUTH_KEYCLOAK_SECRET=
 AUTH_KEYCLOAK_ISSUER=https://keycloak.example.gov.bc.ca/realms/myss
@@ -42,26 +53,25 @@ AUTH_KEYCLOAK_ISSUER=https://keycloak.example.gov.bc.ca/realms/myss
 
 **`AUTH_SECRET`** must be set to any non-empty string. Auth.js uses it to encrypt session cookies. In production, use a strong random value (at least 32 characters).
 
-### Mock authentication (recommended for local dev)
+### Mock authentication (recommended for local dev and OpenShift test deploys)
 
-Setting **`MOCK_AUTH=true`** bypasses Auth.js OIDC entirely and injects a fake authenticated session. This means you can browse all protected routes without configuring BCeID or IDIR providers. The mock is implemented in `src/lib/server/mock-auth.ts` and is guarded by SvelteKit's `dev` flag — it refuses to load in production builds.
+Mock auth bypasses Auth.js OIDC entirely and injects a fake authenticated session keyed by a persona JWT signed by the myss-api seeder. It works in both `npm run dev` and production builds (`node build`) — the frontend's runtime safety gate decides whether to activate.
 
-You can control the mock session with two optional variables:
+**Three locks must all be set** for mock auth to turn on (see `src/lib/server/mock-auth-gate.ts`):
 
-| Variable | Default | Effect |
+| Lock | Value | Purpose |
 |---|---|---|
-| `MOCK_AUTH_ROLE` | `CLIENT` | Sets the session role. Use `WORKER` or `ADMIN` to test worker/admin routes. |
-| `MOCK_AUTH_USER` | `Dev User` | Display name shown in the UI greeting. |
+| `PUBLIC_ALLOW_MOCK_AUTH` | `"true"` | Explicit opt-in. |
+| `PUBLIC_ENVIRONMENT_NAME` | any non-prod name (e.g. `DEV1`, `TEST`) | Refuses to activate when the environment name is `PROD`, `PRD`, or `PRODUCTION` (case-insensitive). |
+| `MOCK_AUTH` | `"true"` | The activation switch. |
 
-To test as a worker, for example:
+If any lock is missing or wrong, the server logs `[auth] real Auth.js active — mock gate closed: <reason>` on startup and falls back to real OIDC.
 
-```dotenv
-MOCK_AUTH=true
-MOCK_AUTH_ROLE=WORKER
-MOCK_AUTH_USER=Test Worker
-```
+**Populating the persona tokens.** In the myss-api repo, run `python scripts/seed_db.py` — it prints a block labelled `myss-web .env (paste into myss-web/.env):`. Copy those four `MOCK_AUTH_TOKEN_*` lines into your `.env`. Tokens default to 1-day expiry; set `SEED_TOKEN_TTL_DAYS=90` when running the seeder if you want longer-lived tokens.
 
-To disable mock auth and use real OIDC login, either remove `MOCK_AUTH` or set it to any value other than `true`.
+**Switching personas at runtime.** When mock auth is active, a floating `DevPersonaSwitcher` toolbar appears in the bottom-right of every page. Click to swap between Alice, Bob, Carol, and Worker — the toolbar writes a `mock_persona` cookie that the server consults on every request.
+
+To disable mock auth and use real OIDC login, remove any one of the three locks (easiest: set `MOCK_AUTH=` empty).
 
 ## Start the Dev Server
 
