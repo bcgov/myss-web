@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myss-frontend
+spec:
+  template:
+    spec:
+      containers:
+        - name: myss-frontend
+          envFrom:
+            - secretRef:
+                name: myss-auth-secret
+            - configMapRef:
+                name: myss-frontend-config
+            - secretRef:
+                name: mock-auth-tokens

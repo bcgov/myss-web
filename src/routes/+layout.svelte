@@ -43,7 +43,7 @@
 
 {@render children()}
 
-{#if dev}
+{#if data.mockAuthEnabled}
 	{#await import('$lib/components/DevPersonaSwitcher.svelte') then { default: DevPersonaSwitcher }}
 		<DevPersonaSwitcher session={data.session as unknown as Record<string, unknown> | null} />
 	{/await}

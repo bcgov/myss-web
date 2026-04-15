@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: myss-frontend-config
+data:
+  PUBLIC_ENVIRONMENT_NAME: "TEST"
+  PUBLIC_ALLOW_MOCK_AUTH: "true"
+  MOCK_AUTH: "true"
+  MOCK_AUTH_PERSONA: "alice"
+  MOCK_AUTH_USER: "Test Worker"
